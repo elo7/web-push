@@ -2,6 +2,9 @@ package nl.martijndwars.webpush;
 
 import com.google.common.base.Predicate;
 import com.google.common.io.BaseEncoding;
+import com.saucelabs.common.SauceOnDemandAuthentication;
+import com.saucelabs.common.SauceOnDemandSessionIdProvider;
+import com.saucelabs.junit.SauceOnDemandTestWatcher;
 import io.github.bonigarcia.wdm.ChromeDriverManager;
 import io.github.bonigarcia.wdm.MarionetteDriverManager;
 import org.apache.http.HttpResponse;
@@ -12,6 +15,7 @@ import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.json.JSONObject;
 import org.junit.*;
+import org.junit.rules.TestName;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -20,6 +24,7 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.remote.SessionId;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.File;
@@ -33,7 +38,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class SeleniumTest {
+public class SeleniumTest implements SauceOnDemandSessionIdProvider {
     /**
      * Port of the server that serves the demo application.
      */
@@ -78,6 +83,22 @@ public class SeleniumTest {
      * The WebDriver instance used for the test.
      */
     private WebDriver webDriver;
+
+    /**
+     * Stores the Sauce OnDemand authentication retrieved from system properties
+     */
+    public SauceOnDemandAuthentication authentication = new SauceOnDemandAuthentication();
+
+    /**
+     * JUnit Rule that will mark the Sauce Job as passed/failed when the test succeeds or fails.
+     */
+    @Rule
+    public SauceOnDemandTestWatcher resultReportingTestWatcher = new SauceOnDemandTestWatcher(this, authentication);
+
+    /**
+     * The session ID for the SeleniumRC/WebDriver instance
+     */
+    private SessionId sessionId;
 
     // TODO: List of drivers and that should be tested, i.e. FireFox with version x, Chrome with version y..
 
@@ -231,6 +252,8 @@ public class SeleniumTest {
         webDriver = getChromeDriver();
         webDriver.get(SERVER_URL);
 
+        sessionId = ((RemoteWebDriver) webDriver).getSessionId();
+
         String[] subscription = getSubscription(webDriver);
         String endpoint = subscription[0];
         String userAuthBase64 = subscription[1];
@@ -257,6 +280,8 @@ public class SeleniumTest {
 
         webDriver = getChromeDriver();
         webDriver.get(SERVER_URL + "?vapid");
+
+        sessionId = ((RemoteWebDriver) webDriver).getSessionId();
 
         String[] subscription = getSubscription(webDriver);
         String endpoint = subscription[0];
@@ -287,6 +312,8 @@ public class SeleniumTest {
         webDriver = getFireFoxDriver();
         webDriver.get(SERVER_URL + "?vapid");
 
+        sessionId = ((RemoteWebDriver) webDriver).getSessionId();
+
         String[] subscription = getSubscription(webDriver);
         String endpoint = subscription[0];
         String userAuthBase64 = subscription[1];
@@ -313,6 +340,8 @@ public class SeleniumTest {
     public void testFireFox() throws Exception {
         webDriver = getFireFoxDriver();
         webDriver.get(SERVER_URL);
+
+        sessionId = ((RemoteWebDriver) webDriver).getSessionId();
 
         String[] subscription = getSubscription(webDriver);
         String endpoint = subscription[0];
@@ -388,5 +417,10 @@ public class SeleniumTest {
         if (webDriver != null) {
             webDriver.quit();
         }
+    }
+
+    @Override
+    public String getSessionId() {
+        return sessionId.toString();
     }
 }
