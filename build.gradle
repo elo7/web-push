@@ -106,6 +106,9 @@ dependencies {
     // For testing, obviously
     testCompile group: 'junit', name: 'junit', version: '4.11'
 
+    // To send test results to Sauce Labs
+    testCompile group: 'com.saucelabs', name: 'sauce_junit', version: '2.1.21'
+
     // For parsing and unparsing JSON
     testCompile group: 'org.json', name: 'json', version: '20160212'
 
