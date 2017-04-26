@@ -1,11 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
-         xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>nl.martijndwars</groupId>
     <artifactId>web-push</artifactId>
     <version>2.0.3-SNAPSHOT</version>
     <packaging>jar</packaging>
+
+    <scm>
+        <connection>scm:git:git@github.com:elo7/web-push.git</connection>
+        <developerConnection>scm:git:git@github.com:elo7/web-push.git</developerConnection>
+        <url>scm:git:git@github.com:elo7/web-push.git</url>
+        <tag>HEAD</tag>
+    </scm>
+
+    <distributionManagement>
+        <repository>
+            <id>central</id>
+            <name>Elo7 Artifactory - Releases</name>
+            <url>http://artifactory.elo7aws.com.br:8081/artifactory/libs-release-local</url>
+        </repository>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <name>Elo7 Artifactory - Snapshots</name>
+            <url>http://artifactory.elo7aws.com.br:8081/artifactory/libs-snapshot-local</url>
+        </snapshotRepository>
+    </distributionManagement>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
