@@ -1,6 +1,24 @@
 package nl.martijndwars.webpush;
 
-import com.google.common.io.BaseEncoding;
+import java.io.IOException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.Key;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.SecureRandom;
+import java.security.spec.InvalidKeySpecException;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
@@ -15,16 +33,12 @@ import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.jwt.JwtClaims;
 import org.jose4j.lang.JoseException;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-import java.io.IOException;
-import java.security.*;
-import java.security.spec.InvalidKeySpecException;
-import java.util.*;
+import com.google.common.io.BaseEncoding;
 
 public class PushService {
-    /**
+    private static final String NATIVE_PRNG_NON_BLOCKING = "NativePRNGNonBlocking";
+
+	/**
      * The Google Cloud Messaging API key (for pre-VAPID in Chrome)
      */
     private String gcmApiKey;
@@ -65,7 +79,7 @@ public class PushService {
         Map<String, String> labels = new HashMap<>();
         labels.put("server-key-id", "P-256");
 
-        byte[] salt = SecureRandom.getSeed(16);
+        byte[] salt = SecureRandom.getInstance(NATIVE_PRNG_NON_BLOCKING).generateSeed(16);
 
         HttpEce httpEce = new HttpEce(keys, labels);
         byte[] ciphertext = httpEce.encrypt(buffer, salt, null, "server-key-id", userPublicKey, userAuth, padSize);
